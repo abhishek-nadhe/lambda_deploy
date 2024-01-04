@@ -35,15 +35,22 @@ jobs:
       #     echo "${{ secrets.AWS_SECRETS_YAML }}" > ./secrets.yml
       #     export $(cat ./secrets.yml | jq -r 'to_entries | .[] | "AWS_" + .key + "=" + (.value | @sh)')
       
-      - name: Get Secrets by Name and by ARN
-        uses: aws-actions/aws-secretsmanager-get-secrets@v1
-        with:
-          secret-ids: |
-            AWS_INFRA_DEV_ENV
-          parse-json-secrets: true
-        env:
-          AWS_REGION: us-east-1
-      
+      # - name: Get Secrets by Name and by ARN
+      #   uses: aws-actions/aws-secretsmanager-get-secrets@v1
+      #   with:
+      #     secret-ids: |
+      #       AWS_INFRA_DEV_ENV
+      #     parse-json-secrets: true
+      #   env:
+      #     AWS_REGION: us-east-1
+
+      - name: Export variables from secret
+        run: |
+          ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
+          echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+          cat $GITHUB_ENV
+
+        
       - name: Print Secrets
         run: |
           echo "SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}"
