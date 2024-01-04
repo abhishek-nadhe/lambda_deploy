@@ -30,10 +30,10 @@ jobs:
 
       - name: Export variables from secret
         run: |
-        
+
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
           echo "$ENV_JSON" | jq -r 'to_entries[] | "export \(.key)=\(.value)"' >> $GITHUB_ENV
-          echo "::add-mask::$ENV_JSON" >> $GITHUB_ENV
+          echo "$ENV_JSON" | jq -r 'to_entries[] | "echo \"::add-mask::\(.value)\""'
              
       - name: Set AWS CLI credentials and region
         run: |
