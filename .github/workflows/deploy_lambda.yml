@@ -18,36 +18,35 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Parse secrets from JSON
-        id: parse_secrets
-        run: |
-          echo "${{ secrets.AWS_DEV_INFRA }}" > aws_dev_infra.json
-          echo "::set-output name=SECRETS::$(echo ${{ secrets.AWS_DEV_INFRA }} | base64 -w 0)"
-      
-      - name: Set up environment
-        run: |
-          echo "${{ secrets.AWS_DEV_INFRA }}" > ./dev-aws-infra.json
-          export $(jq -r '. | to_entries | .[] | "AWS_" + .key + "=" + (.value | @sh)' ./dev-aws-infra.json)
+      # - name: Parse secrets from JSON
+      #   id: parse_secrets
+      #   run: |
+      #     echo "${{ secrets.AWS_DEV_INFRA }}" > aws_dev_infra.json
+      #     echo "::set-output name=SECRETS::$(echo ${{ secrets.AWS_DEV_INFRA }} | base64 -w 0)"
 
-      - name: Set up environment using yaml
-        run: |
-          echo "${{ secrets.AWS_SECRETS_YAML }}" > ./secrets.yml
-          export $(cat ./secrets.yml | jq -r 'to_entries | .[] | "AWS_" + .key + "=" + (.value | @sh)')
+      # - name: Parse secrets from JSON
+      #   id: parse_secrets
+      #   run: |
+      #       AWS_DEV_INFRA_JSON=$(echo "${{ secrets.AWS_DEV_INFRA }}" | base64 -d)
+      #       export $(echo "${AWS_DEV_INFRA_JSON}" | jq -r 'to_entries | .[] | "AWS_\(.key | ascii_upcase)=\(.value)"')
+
+      # - name: Set up environment using yaml
+      #   run: |
+      #     echo "${{ secrets.AWS_SECRETS_YAML }}" > ./secrets.yml
+      #     export $(cat ./secrets.yml | jq -r 'to_entries | .[] | "AWS_" + .key + "=" + (.value | @sh)')
+      
+      - name: Get Secrets by Name and by ARN
+        uses: aws-actions/aws-secretsmanager-get-secrets@v1
+        with:
+          secret-ids: |
+            AWS_INFRA_DEV_ENV
+          parse-json-secrets: true
       
       - name: Print Secrets
         run: |
-          echo "PRIVATE_KEY: $AWS_PRIVATE_KEY"
-          echo "SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY"
-          echo "ACCOUNT_ID: $AWS_ACCOUNT_ID"
-          echo "DEFAULT_REGION: $AWS_DEFAULT_REGION"
-          echo "ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID"
-          echo "ECR_REPO_URL: $AWS_ECR_REPO_URL"
-          echo "PASS: $AWS_PASS"
-          echo "ECR_NAME: $AWS_ECR_NAME"
-          echo "KAMP_EC2_USER: $AWS_KAMP_EC2_USER"
-          echo "EC2_1_IP: $AWS_EC2_1_IP"
-          echo "LAMBDA_FUNC: $AWS_LAMBDA_FUNC"
-          echo "LAMBDA_LG: $AWS_LAMBDA_LG"
+          echo "SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}"
+          echo "ACCOUNT_ID: ${{ secrets.AWS_DEV_INFRA.ACCOUNT_ID }}"
+          # Add more echo statements for other secrets as needed
 
       - name: Install AWS CLI
         run: |
