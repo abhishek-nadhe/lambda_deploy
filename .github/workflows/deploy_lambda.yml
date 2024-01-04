@@ -61,5 +61,5 @@ jobs:
             --filter-pattern "" \
             --output text \
             --query 'events[*].message' | \
-          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} "mkdir -p ~/$GITHUB_JOB && cat >> ~/$GITHUB_JOB/aws_lambda_logs.txt"
+          ssh -o StrictHostKeyChecking=no -i private_key $KAMP_EC2_USER@$EC2_1_IP "mkdir -p ~/$GITHUB_JOB && cat >> ~/$GITHUB_JOB/aws_lambda_logs.txt"
           echo "Logs have been sent."  
