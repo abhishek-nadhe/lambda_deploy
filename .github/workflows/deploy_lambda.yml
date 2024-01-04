@@ -23,15 +23,17 @@ jobs:
       #     ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
       #     echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
+
+      # ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
+      # masked_vars=$(echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"')
+      # echo "::add-mask::$masked_vars" >> $GITHUB_ENV
+
       - name: Export variables from secret
         run: |
+        
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
-          masked_vars=$(echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"')
-          echo "::add-mask::$masked_vars" >> $GITHUB_ENV
-          
-          while IFS= read -r line; do
-            export "$line"
-          done < <(echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"')
+          echo "$ENV_JSON" | jq -r 'to_entries[] | "export \(.key)=\(.value)"' >> $GITHUB_ENV
+          echo "::add-mask::$ENV_JSON" >> $GITHUB_ENV
              
       - name: Set AWS CLI credentials and region
         run: |
