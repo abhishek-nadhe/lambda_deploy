@@ -32,11 +32,11 @@ jobs:
         run: |
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
           export MASKED_JSON=$(echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=***"')
-          echo "$MASKED_JSON" >> $GITHUB_ENV
-          source $GITHUB_ENV
-             
+          echo "$MASKED_JSON" >> $GITHUB_ENV     
+          
       - name: Set AWS CLI credentials and region
         run: |
+          source $GITHUB_ENV
           aws configure set aws_access_key_id $ACCESS_KEY_ID
           aws configure set aws_secret_access_key $SECRET_ACCESS_KEY
           aws configure set region $DEFAULT_REGION
