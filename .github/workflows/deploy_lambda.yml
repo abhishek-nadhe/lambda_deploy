@@ -41,6 +41,8 @@ jobs:
           secret-ids: |
             AWS_INFRA_DEV_ENV
           parse-json-secrets: true
+        env:
+          AWS_REGION: us-east-1
       
       - name: Print Secrets
         run: |
