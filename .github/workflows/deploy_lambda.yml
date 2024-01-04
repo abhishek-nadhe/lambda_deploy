@@ -27,10 +27,8 @@ jobs:
         run: |
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
           masked_vars=$(echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"')
-          echo "$masked_vars" >> $GITHUB_ENV
-          echo "::add-mask::$masked_vars"
-
-          
+          echo "::add-mask::$masked_vars" >> $GITHUB_ENV
+             
       - name: Set AWS CLI credentials and region
         run: |
           aws configure set aws_access_key_id $ACCESS_KEY_ID
@@ -51,11 +49,6 @@ jobs:
           aws lambda update-function-code --function-name $LAMBDA_FUNC --zip-file fileb://function.zip --region $DEFAULT_REGION
           sleep 15s
           aws lambda update-function-configuration --function-name $LAMBDA_FUNC --tracing-config Mode=Active --environment "Variables={LOG_GROUP_NAME=${LAMBDA_LG}}" --handler src/amp_lambda_function/lambda_function.py
-
-      # - name: Set permissions for private key
-      #   run: |
-      #    echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-      #     chmod 600 ${{ secrets.PRIVATE_KEY_PEM }}
      
       - name: Send logs to EC2 instance
         env:
