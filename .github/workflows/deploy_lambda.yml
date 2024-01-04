@@ -28,9 +28,10 @@ jobs:
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
           masked_vars=$(echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"')
           echo "::add-mask::$masked_vars" >> $GITHUB_ENV
-          export ACCESS_KEY_ID=${{ secrets.AWS_DEV_INFRA.ACCESS_KEY_ID }}
-          export SECRET_ACCESS_KEY=${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}
-          export DEFAULT_REGION=${{ secrets.AWS_DEV_INFRA.DEFAULT_REGION }}
+          
+          while IFS= read -r line; do
+            export "$line"
+          done < <(echo "$ENV_JSON" | jq -r 'to_entries | .[] | "\(.key)=\(.value)"')
              
       - name: Set AWS CLI credentials and region
         run: |
