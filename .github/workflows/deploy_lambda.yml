@@ -53,8 +53,8 @@ jobs:
       - name: Send logs to EC2 instance
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY_PEM }}
-          HOSTNAME: ${{secrets.EC2_USER}}
-          USER_NAME: ${{secrets.EC2_1_IP}}
+          HOSTNAME: $EC2_USER
+          USER_NAME: $EC2_1_IP
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           aws logs filter-log-events \
