@@ -31,6 +31,9 @@ jobs:
              
       - name: Set AWS CLI credentials and region
         run: |
+          export ACCESS_KEY_ID=${{ secrets.AWS_DEV_INFRA.ACCESS_KEY_ID }}
+          export SECRET_ACCESS_KEY=${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}
+          export DEFAULT_REGION=${{ secrets.AWS_DEV_INFRA.DEFAULT_REGION }}
           aws configure set aws_access_key_id $ACCESS_KEY_ID
           aws configure set aws_secret_access_key $SECRET_ACCESS_KEY
           aws configure set region $DEFAULT_REGION
