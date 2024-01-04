@@ -29,14 +29,13 @@ jobs:
           echo "SECRET_ACCESS_KEY: $SECRET_ACCESS_KEY"
           echo "ACCOUNT_ID: $ACCOUNT_ID"
           echo "AWS_REGION: $DEFAULT_REGION"
-        
-
-      - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+          
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
         with:
-          aws-access-key-id: $ACCESS_KEY_ID
-          aws-secret-access-key: $SECRET_ACCESS_KEY
-          aws-region: $DEFAULT_REGION
+          aws-access-key-id: ${{ secrets.AWS_DEV_INFRA.ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEV_INFRA.DEFAULT_REGION }}
 
       - name: Install AWS CLI
         run: |
