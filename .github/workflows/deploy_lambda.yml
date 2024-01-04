@@ -22,7 +22,6 @@ jobs:
         run: |
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
           echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
-          cat $GITHUB_ENV
           
       - name: Set AWS CLI credentials and region
         run: |
@@ -53,8 +52,8 @@ jobs:
       - name: Send logs to EC2 instance
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY_PEM }}
-          HOSTNAME: $EC2_USER
-          USER_NAME: $EC2_1_IP
+          HOSTNAME: $EC2_1_IP
+          USER_NAME: $KAMP_EC2_USER
         run: |
           echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           aws logs filter-log-events \
