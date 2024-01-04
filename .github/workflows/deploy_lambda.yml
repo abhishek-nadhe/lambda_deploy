@@ -18,11 +18,11 @@ jobs:
         with:
           python-version: 3.8
 
-      # - name: Parse secrets from JSON
-      #   id: parse_secrets
-      #   run: |
-      #     echo "${{ secrets.AWS_DEV_INFRA }}" > aws_dev_infra.json
-      #     echo "::set-output name=SECRETS::$(echo ${{ secrets.AWS_DEV_INFRA }} | base64 -w 0)"
+      - name: Parse secrets from JSON
+        id: parse_secrets
+        run: |
+          echo "${{ secrets.AWS_DEV_INFRA }}" > aws_dev_infra.json
+          echo "::set-output name=SECRETS::$(echo ${{ secrets.AWS_DEV_INFRA }} | base64 -w 0)"
       
       - name: Set up environment
         run: |
@@ -56,7 +56,7 @@ jobs:
 
       - name: Echo Lambda Function Name
         run: |
-          lambda_function_name="${AWS_LAMBDA_FUNC}"
+          lambda_function_name="${LAMBDA_FUNC}"
           echo "Lambda Function Name: $lambda_function_name"
 
       - name: Zip Lambda function
