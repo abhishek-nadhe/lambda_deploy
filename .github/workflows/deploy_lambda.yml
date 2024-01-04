@@ -28,14 +28,16 @@ jobs:
         run: |
           echo "${{ secrets.AWS_DEV_INFRA }}" > ./dev-aws-infra.json
           export $(jq -r '. | to_entries | .[] | "AWS_" + .key + "=" + (.value | @sh)' ./dev-aws-infra.json)
-          
-          echo "Printing environment variables:"
-          printenv | grep AWS_
 
       - name: Install AWS CLI
         run: |
           sudo apt-get install -y python3-pip
           pip3 install awscli --upgrade
+
+      - name: Echo Lambda Function Name
+        run: |
+          lambda_function_name="${AWS_LAMBDA_FUNC}"
+          echo "Lambda Function Name: $lambda_function_name"
 
       - name: Zip Lambda function
         run: |
