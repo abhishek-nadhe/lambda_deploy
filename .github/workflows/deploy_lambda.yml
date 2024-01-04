@@ -58,16 +58,22 @@ jobs:
           sleep 15s
           aws lambda update-function-configuration --function-name $LAMBDA_FUNC --tracing-config Mode=Active --environment Variables={LOG_GROUP_NAME=$LAMBDA_LG --handler src/amp_lambda_function/lambda_function.py
 
-      - name: Set permissions for private key
-        run: |
-          chmod 600 ${{ secrets.PRIVATE_KEY_PEM }}
+      # - name: Set permissions for private key
+      #   run: |
+      #    echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
+      #     chmod 600 ${{ secrets.PRIVATE_KEY_PEM }}
      
       - name: Send logs to EC2 instance
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY_PEM }}
+          HOSTNAME: ${{secrets.EC2_USER}}
+          USER_NAME: ${{secrets.EC2_1_IP}}
         run: |
+          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
           aws logs filter-log-events \
             --log-group-name "${{ secrets.AWS_DEV_INFRA.LAMBDA_LG }}" \
             --filter-pattern "" \
             --output text \
             --query 'events[*].message' | \
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.PRIVATE_KEY_PEM }} ${{ secrets.AWS_DEV_INFRA.EC2_USER }}@${{ secrets.AWS_DEV_INFRA.EC2_1_IP }} "mkdir -p ~/$GITHUB_JOB && cat >> ~/$GITHUB_JOB/aws_lambda_logs.txt"
+          ssh -o StrictHostKeyChecking=no -i private_key ${USER_NAME}@${HOSTNAME} "mkdir -p ~/$GITHUB_JOB && cat >> ~/$GITHUB_JOB/aws_lambda_logs.txt"
           echo "Logs have been sent."  
