@@ -21,7 +21,22 @@ jobs:
       - name: Export variables from secret
         run: |
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
-          echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+          echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> env-vars.sh
+          source env-vars.sh
+          
+      - name: Print exported variables
+        run: |
+          echo "SECRET_ACCESS_KEY=$SECRET_ACCESS_KEY"
+          echo "ACCOUNT_ID=$ACCOUNT_ID"
+          echo "DEFAULT_REGION=$DEFAULT_REGION"
+          echo "ACCESS_KEY_ID=$ACCESS_KEY_ID"
+          echo "ECR_REPO_URL=$ECR_REPO_URL"
+          echo "PASS=$PASS"
+          echo "ECR_NAME=$ECR_NAME"
+          echo "KAMP_EC2_USER=$KAMP_EC2_USER"
+          echo "EC2_1_IP=$EC2_1_IP"
+          echo "LAMBDA_FUNC=$LAMBDA_FUNC"
+          echo "LAMBDA_LG=$LAMBDA_LG"
 
       - name: Print Secrets
         run: |
@@ -30,19 +45,12 @@ jobs:
           echo "AWS_REGION:${{ secrets.AWS_DEV_INFRA.DEFAULT_REGION }}"
           # Add more echo statements for other secrets as needed
 
-      # - name: Set up AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_DEV_INFRA.ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ secrets.AWS_DEV_INFRA.DEFAULT_REGION }}
-
       - name: Set up AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: $ACCESS_KEY_ID
-          aws-secret-access-key: $SECRET_ACCESS_KEY
-          aws-region: $DEFAULT_REGION
+          aws-access-key-id: ${{ secrets.AWS_DEV_INFRA.ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEV_INFRA.DEFAULT_REGION }}
 
       - name: Install AWS CLI
         run: |
