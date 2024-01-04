@@ -34,38 +34,23 @@ jobs:
       #   run: |
       #     echo "${{ secrets.AWS_SECRETS_YAML }}" > ./secrets.yml
       #     export $(cat ./secrets.yml | jq -r 'to_entries | .[] | "AWS_" + .key + "=" + (.value | @sh)')
-      
-      # - name: Get Secrets by Name and by ARN
-      #   uses: aws-actions/aws-secretsmanager-get-secrets@v1
-      #   with:
-      #     secret-ids: |
-      #       AWS_INFRA_DEV_ENV
-      #     parse-json-secrets: true
-      #   env:
-      #     AWS_REGION: us-east-1
+
 
       - name: Export variables from secret
         run: |
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
           echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
-          cat $GITHUB_ENV
 
-        
-      - name: Print Secrets
-        run: |
-          echo "SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}"
-          echo "ACCOUNT_ID: ${{ secrets.AWS_DEV_INFRA.ACCOUNT_ID }}"
-          # Add more echo statements for other secrets as needed
+      # - name: Print Secrets
+      #   run: |
+      #     echo "SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}"
+      #     echo "ACCOUNT_ID: ${{ secrets.AWS_DEV_INFRA.ACCOUNT_ID }}"
+      #     # Add more echo statements for other secrets as needed
 
       - name: Install AWS CLI
         run: |
           sudo apt-get install -y python3-pip
           pip3 install awscli --upgrade
-
-      - name: Echo Lambda Function Name
-        run: |
-          lambda_function_name="${LAMBDA_FUNC}"
-          echo "Lambda Function Name: $lambda_function_name"
 
       - name: Zip Lambda function
         run: |
@@ -73,20 +58,20 @@ jobs:
 
       - name: Deploy Lambda function
         run: |
-          aws lambda update-function-code --function-name ${{ secrets.AWS_LAMBDA_FUNC }} --zip-file fileb://function.zip --region ${{ secrets.AWS_DEFAULT_REGION }}
+          aws lambda update-function-code --function-name ${{ secrets.AWS_DEV_INFRA.LAMBDA_FUNC }} --zip-file fileb://function.zip --region ${{ secrets.AWS_DEV_INFRA.DEFAULT_REGION }}
           sleep 15s
-          aws lambda update-function-configuration --function-name ${{ secrets.AWS_LAMBDA_FUNC }} --tracing-config Mode=Active --environment Variables={LOG_GROUP_NAME=${{ secrets.AWS_LAMBDA_LG }}} --handler src/amp_lambda_function/lambda_function.py
+          aws lambda update-function-configuration --function-name ${{ secrets.AWS_DEV_INFRA.LAMBDA_FUNC }} --tracing-config Mode=Active --environment Variables={LOG_GROUP_NAME=${{ secrets.AWS_LAMBDA_LG }}} --handler src/amp_lambda_function/lambda_function.py
 
       - name: Set permissions for private key
         run: |
-          chmod 600 ${{ secrets.AWS_PRIVATE_KEY }}
+          chmod 600 ${{ secrets.PRIVATE_KEY_PEM }}
      
       - name: Send logs to EC2 instance
         run: |
           aws logs filter-log-events \
-            --log-group-name "${{ secrets.AWS_LAMBDA_LG }}" \
+            --log-group-name "${{ secrets.AWS_DEV_INFRA.LAMBDA_LG }}" \
             --filter-pattern "" \
             --output text \
             --query 'events[*].message' | \
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.AWS_PRIVATE_KEY_PEM }} ${{ secrets.AWS_EC2_USER }}@${{ secrets.AWS_EC2_1_IP }} "mkdir -p ~/$GITHUB_JOB && cat >> ~/$GITHUB_JOB/aws_lambda_logs.txt"
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.PRIVATE_KEY_PEM }} ${{ secrets.AWS_DEV_INFRA.EC2_USER }}@${{ secrets.AWS_DEV_INFRA.EC2_1_IP }} "mkdir -p ~/$GITHUB_JOB && cat >> ~/$GITHUB_JOB/aws_lambda_logs.txt"
           echo "Logs have been sent."  
