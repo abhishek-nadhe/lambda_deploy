@@ -26,10 +26,10 @@ jobs:
 
       - name: Print Secrets
         run: |
-          echo "SECRET_ACCESS_KEY: ${{ secrets.AWS_DEV_INFRA.SECRET_ACCESS_KEY }}"
-          echo "ACCOUNT_ID: ${{ secrets.AWS_DEV_INFRA.ACCOUNT_ID }}"
-          echo "AWS_REGION:${{ secrets.AWS_DEV_INFRA.DEFAULT_REGION }}"
-          # Add more echo statements for other secrets as needed
+          echo "SECRET_ACCESS_KEY: $SECRET_ACCESS_KEY"
+          echo "ACCOUNT_ID: $ACCOUNT_ID"
+          echo "AWS_REGION: $DEFAULT_REGION"
+        
 
       # - name: Set up AWS credentials
       #   uses: aws-actions/configure-aws-credentials@v1
