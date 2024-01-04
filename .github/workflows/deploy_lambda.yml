@@ -18,10 +18,18 @@ jobs:
         with:
           python-version: 3.8
 
+      # - name: Export variables from secret
+      #   run: |
+      #     ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
+      #     echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+
       - name: Export variables from secret
         run: |
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
-          echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+          masked_vars=$(echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"')
+          echo "$masked_vars" >> $GITHUB_ENV
+          echo "::add-mask::$masked_vars"
+
           
       - name: Set AWS CLI credentials and region
         run: |
