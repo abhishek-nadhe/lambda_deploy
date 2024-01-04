@@ -29,6 +29,11 @@ jobs:
           echo "${{ secrets.AWS_DEV_INFRA }}" > ./dev-aws-infra.json
           export $(jq -r '. | to_entries | .[] | "AWS_" + .key + "=" + (.value | @sh)' ./dev-aws-infra.json)
 
+      - name: Print Lambda function and log group names
+        run: |
+          echo "Lambda Function Name: $AWS_LAMBDA_FUNC"
+          echo "Log Group Name: $AWS_LAMBDA_LG"
+
       - name: Install AWS CLI
         run: |
           sudo apt-get install -y python3-pip
