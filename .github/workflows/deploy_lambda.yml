@@ -10,10 +10,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # - name: Set up Python
-      #   uses: actions/setup-python@v5.0.0
-      #   with:
-      #     python-version: 3.10
+      - name: Set up Python
+        uses: actions/setup-python@v5.0.0
+        with:
+          python-version: '3.10'
 
       - name: Export variables from secret
         run: |
@@ -26,10 +26,11 @@ jobs:
       #     aws configure set aws_secret_access_key $SECRET_ACCESS_KEY
       #     aws configure set region $DEFAULT_REGION
 
-      - name: Configure AWS Credentials Action for GitHub Actions
-        run: |
-          aws-region: ${{ secrets.AWS_DEFALUT_REGION }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_DEFALUT_REGION }}
 
       - name: Install AWS CLI
         run: |
