@@ -20,17 +20,18 @@ jobs:
           ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
           echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
 
-      # - name: Set AWS CLI credentials and region
-      #   run: |
-      #     aws configure set aws_access_key_id $ACCESS_KEY_ID
-      #     aws configure set aws_secret_access_key $SECRET_ACCESS_KEY
-      #     aws configure set region $DEFAULT_REGION
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          # role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_DEFALUT_REGION }}
+      - name: Set AWS CLI credentials and region
+        run: |
+          # aws configure set aws_access_key_id $ACCESS_KEY_ID
+          # aws configure set aws_secret_access_key $SECRET_ACCESS_KEY
+          aws configure set region ${{ secrets.AWS_DEFALUT_REGION }}
+
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     # role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
+      #     aws-region: ${{ secrets.AWS_DEFALUT_REGION }}
 
       - name: Install AWS CLI
         run: |
