@@ -46,6 +46,8 @@ jobs:
 
       - name: Deploy Lambda function
         run: |
+          cd ${GITHUB_WORKSPACE}/src
+          ls -la ${GITHUB_WORKSPACE}/src
           aws lambda update-function-code --function-name ${{ secrets.LAMBDA_FUNC }} --zip-file fileb://function.zip --region ${{ secrets.AWS_DEFALUT_REGION }}
           sleep 15s
           aws lambda update-function-configuration --function-name ${{ secrets.LAMBDA_FUNC }} --tracing-config Mode=Active --environment "Variables={LOG_GROUP_NAME=${{ secrets.LAMBDA_LG }}" --handler amp_lambda_function/lambda_function.py
