@@ -20,28 +20,16 @@ jobs:
           sudo apt-get install -y python3-pip
           pip3 install awscli --upgrade
 
-      - name: Export variables from secret
-        run: |
-          ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
-          echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
-
-      - name: Set AWS CLI credentials with Iam Role Arn and region
-        run: |
-          # aws configure set aws_access_key_id $ACCESS_KEY_ID
-          # aws configure set aws_secret_access_key $SECRET_ACCESS_KEY
-          aws configure set region ${{ secrets.AWS_DEFALUT_REGION }}
-
-      - name: Assume IAM Role
-        env:
-          AWS_ROLE_ARN: ${{ secrets.AWS_IAM_ROLE_ARN }}
-        run: |
-          aws sts assume-role --role-arn $AWS_ROLE_ARN --role-session-name GitHubActions > assume-role-output.json
-
-      # - name: Configure AWS Credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with:
-      #     # role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
-      #     aws-region: ${{ secrets.AWS_DEFALUT_REGION }}
+      # - name: Export variables from secret
+      #   run: |
+      #     ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
+      #     echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_DEFALUT_REGION }}
 
       - name: Zip Lambda function
         run: |
