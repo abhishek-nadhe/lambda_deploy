@@ -3,6 +3,14 @@ name: Deploy Lambda Function
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read 
+  pull-requests: write 
+env:
+  TF_LOG: INFO
+  AWS_REGION: ${{ secrets.AWS_DEFALUT_REGION }}
+
 jobs:
   deploy_lambda:
     runs-on: ubuntu-latest
@@ -25,11 +33,18 @@ jobs:
       #     ENV_JSON='${{ secrets.AWS_DEV_INFRA }}'
       #     echo "$ENV_JSON" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >> $GITHUB_ENV
       
-      - name: Configure AWS Credentials
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
+      #     aws-region: ${{ secrets.AWS_DEFALUT_REGION }}
+
+      - name: Configure AWS credentials from AWS account
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_DEFALUT_REGION }}
+          role-session-name: GitHub-OIDC-LABDA-SESSION
 
       - name: Zip Lambda function
         run: |
